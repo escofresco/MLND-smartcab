@@ -1,3 +1,6 @@
-# Ignore Jupyter notebook meta data
+# Ignore Jupyter notebook related dirs and files
 .ipynb_checkpoints/
+
+# Ignore python related dirs and files
 __pycache__/
+*.pyc
