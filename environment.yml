@@ -10,6 +10,7 @@ dependencies:
   - ca-certificates=2018.03.07=0
   - certifi=2018.8.13=py27_0
   - cycler=0.10.0=py27_0
+  - cython=0.28.5=py27hf484d3e_0
   - dbus=1.13.2=h714fa37_1
   - expat=2.2.5=he0dffb1_0
   - fontconfig=2.13.0=h9420a91_0
@@ -61,6 +62,7 @@ dependencies:
   - wheel=0.31.1=py27_0
   - xz=5.2.4=h14c3975_4
   - zlib=1.2.11=ha838bed_2
-  - pygame=1.9.2=py27_1
   - sdl=2.0.1=1
+  - pip:
+    - pygame==1.9.4
 prefix: /home/jonasz/anaconda3/envs/mlnd
