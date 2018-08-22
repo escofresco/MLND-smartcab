@@ -1,3 +1,6 @@
+# Ignore project-specific dirs and files
+logs/
+
 # Ignore Jupyter notebook related dirs and files
 .ipynb_checkpoints/
 
