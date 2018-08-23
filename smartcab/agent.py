@@ -9,7 +9,12 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """
 
-    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
+    def __init__(self,
+                 env,
+                 learning=False,
+                 epsilon=1.0,
+                 epsilon_decay=0.0001,
+                 alpha=0.5):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
@@ -19,7 +24,7 @@ class LearningAgent(Agent):
         self.Q = dict()          # Create a Q-table which will be a dictionary of tuples
         self.epsilon = epsilon   # Random exploration factor
         self.alpha = alpha       # Learning factor
-        self.epsilon_decay = 0.999 # Default decay rate
+        self.epsilon_decay = epsilon_decay # Default decay rate
         self.step = 0 # Track every iteration
 
     def reset(self, destination=None, testing=False):
@@ -55,7 +60,6 @@ class LearningAgent(Agent):
         state = (waypoint,
                  inputs['light'],
                  inputs['left'],
-                 inputs['right'],
                  inputs['oncoming'])
 
         return state
@@ -77,10 +81,7 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
         if state not in self.Q:
-             self.Q[state] = {'left': 0.,
-                              'right': 0.,
-                              'forward':0.,
-                              None: 0.}
+             self.Q[state] = {action: 0. for action in self.valid_actions}
         return
 
 
@@ -95,9 +96,8 @@ class LearningAgent(Agent):
         action = random.choice(self.valid_actions) # Random action by default
 
         if self.learning and random.random() > self.epsilon:
-            # When learning, choose an action with the highest Q-value for the current state
-            # with 'epsilon' probability
-            # Be sure that when choosing an action with highest Q-value that you randomly select between actions that "tie".
+            # When learning, choose an action with the highest Q-value
+            #   for the current state with 'epsilon' probability
             maxQ = self.get_maxQ(state)
             actions = [action for action,Q in self.Q[state].items() if Q==maxQ]
             action = random.choice(actions)
@@ -149,13 +149,16 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent, learning=True, alpha=0.1)
+    agent = env.create_agent(LearningAgent,
+                             learning=True,
+                             alpha=0.1)
 
     ##############
     # Follow the driving agent
     # Flags:
     #   enforce_deadline - set to True to enforce a deadline metric
-    env.set_primary_agent(agent, enforce_deadline=True)
+    env.set_primary_agent(agent,
+                          enforce_deadline=True)
 
     ##############
     # Create the simulation
@@ -165,7 +168,7 @@ def run():
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
     sim = Simulator(env,
-                    update_delay=2.,
+                    update_delay=.01,
                     log_metrics=True,
                     optimized=True)
 
@@ -174,7 +177,8 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=100)
+    sim.run(n_test=500,
+            tolerance=0.005)
 
 
 if __name__ == '__main__':
